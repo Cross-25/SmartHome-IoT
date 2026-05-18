@@ -3,7 +3,13 @@ package com.glassinc.smart_home.desktop; // Mets ton vrai package ici
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+
 import javafx.application.Application;
+import javafx.application.Platform;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -12,7 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-
+import javafx.util.Duration;
 
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -49,10 +55,22 @@ public class SmartHomeApp extends Application {
         table.getColumns().add(timeCol);
 
         // 2. Bouton
-        Button fetchButton = new Button("Rafraîchir les capteurs");
-        fetchButton.setOnAction(e -> fetchSensorData(table));
+        Button fetchButton = new Button("Rafraîchir manuellement");
+        //fetchButton.setOnAction(e -> fetchSensorData(table));
 
-        // 3. Mise en page
+        // 3.Timeline
+        // On crée un minuteur qui se déclenche toutes les 5 secondes
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(5),
+                event -> fetchSensorData(table) // Action à éxecuter
+        ));
+        timeline.setCycleCount(Animation.INDEFINITE); //On le répète a l'infini
+        timeline.play(); //On démarre le minuteur
+
+        // Le bouton permet toujours un rafraichissement manuel instantanée
+        fetchButton.setOnAction(event -> fetchSensorData(table));
+
+        // 4. Mise en page
         VBox root = new VBox(10, fetchButton, table);
         Scene scene = new Scene(root, 650, 500);
 
@@ -60,10 +78,11 @@ public class SmartHomeApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Charger les données au démarrage
+        // Premier chargement immédiat au démarrage
         fetchSensorData(table);
     }
 
+    //Méthode de récupération de données ASYNCHRONE
     private void fetchSensorData(TableView<SensorData> table) {
         try {
             HttpClient client = HttpClient.newHttpClient();
@@ -72,16 +91,27 @@ public class SmartHomeApp extends Application {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            // sendAsync est non-bloquant ! L'interface ne gèle pas.
+            client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenApply(HttpResponse::body)
+                    .thenAccept(json -> {
 
-            // --- LA MAGIE DE GSON ---
-            Gson gson = new Gson();
-            // On dit à Gson qu'on veut convertir le JSON en Liste<SensorData>
-            Type listType = new TypeToken<List<SensorData>>(){}.getType();
-            List<SensorData> sensorDataList = gson.fromJson(response.body(), listType);
+                        // --- LA MAGIE DE GSON ---
+                        Gson gson = new Gson();
+                        // On dit à Gson qu'on veut convertir le JSON en Liste<SensorData>
+                        Type listType = new TypeToken<List<SensorData>>(){}.getType();
+                        List<SensorData> sensorDataList = gson.fromJson(json, listType);
 
-            // On met à jour le tableau avec les nouvelles données
-            table.getItems().setAll(sensorDataList);
+                        // ETREMEMENT IMPORTANT
+                        // On ne peut modifier l'interface graphique que depuis le Thread JavaFx.
+                        // Comme on est dans un callback asynchrone (en arrière-plan),
+                        // on doit utiliser Platform.runLater() pour dire à JavaFx de faire la mise à jour
+                        Platform.runLater(() -> {
+                            // On met à jour le tableau avec les nouvelles données
+                            table.getItems().setAll(sensorDataList);
+                        });
+                    });
+            //HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         } catch (Exception ex) {
             System.err.println("Erreur : " + ex.getMessage());
