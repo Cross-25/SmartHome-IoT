@@ -1,5 +1,6 @@
 package com.glassinc.smart_home_api.service;
 
+import com.glassinc.smart_home_api.automation.AutomationRuleService;
 import com.glassinc.smart_home_api.model.SensorData;
 import com.glassinc.smart_home_api.repository.SensorDataRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,10 +13,12 @@ import java.util.Random;
 public class DataSimulatorService {
 
     private final SensorDataRepository sensorDataRepository;
+    private final AutomationRuleService automationRuleService;
     private final Random random = new Random();
 
-    public DataSimulatorService(SensorDataRepository sensorDataRepository) {
+    public DataSimulatorService(SensorDataRepository sensorDataRepository, AutomationRuleService automationRuleService) {
         this.sensorDataRepository = sensorDataRepository;
+        this.automationRuleService = automationRuleService; // AJOUT ICI
     }
 
     // S'exécute toutes les 5000 millisecondes (5 secondes) après la fin de la tâche précédente
@@ -32,5 +35,8 @@ public class DataSimulatorService {
         sensorDataRepository.save(data);
 
         System.out.println(">>> SIMULATION : Température sauvegardée -> " + data.getSensorValue() + "°C");
+
+        // C'EST ICI QU'ON DECLENCHE L'INTELLIGENCE !
+        automationRuleService.evaluateRules(data);
     }
 }
