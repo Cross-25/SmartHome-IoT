@@ -93,10 +93,3 @@ mvn -f smart-home-api test
 ## Contribuer
 - Fork / clone, crée une branche, ouvre une PR.
 - Ajoute des tests pour toute logique métier importante.
-
-## Questions / prochaines étapes
-- Souhaitez-vous que j'ajoute des exemples Postman / httpie, des diagrams d'architecture, ou un guide de déploiement Docker ?
-
----
-
-Fichier généré automatiquement par l'assistant. Pour modifications, éditez `README.md`.

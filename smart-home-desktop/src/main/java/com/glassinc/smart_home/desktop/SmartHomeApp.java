@@ -9,9 +9,11 @@ import javafx.animation.Timeline;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -29,14 +31,150 @@ import java.util.List;
 
 public class SmartHomeApp extends Application {
 
-    private static final String API_URL = "http://localhost:8080/api/sensor-data";
+    private static final String API_BASE_URL = "http://localhost:8080/api";
+    private final Gson gson = new Gson();
+    private final HttpClient client = HttpClient.newHttpClient();
 
     @Override
     public void start(Stage primaryStage) {
 
-        // 1. Création du Tableau
-        TableView<SensorData> table = new TableView<>();
+        // --- SECTION  CAPTEURS (Haut) ---
+        Label sensorTitle = new Label("\uD83D\uDCE1 Capteurs en direct");
+        sensorTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
+        // 1. Création du Tableau
+        TableView<SensorData> sensorTable = new TableView<>();
+        setupSensorTable(sensorTable); // Méthode pour configurer les colonnes
+
+        // --- SECTION APPAREILS (Bas) ---
+        Label deviceTitle = new Label("\uD83D\uDCA1 Contrôle des appareils");
+        deviceTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+
+        TableView<Device> deviceTable = new TableView<>();
+        setupDeviceTable(deviceTable); // Méthode pour configurer les colonnes
+
+        // --- BOUTON DE CONTRÔLE ---
+        Button toggleButton = new Button("Allumer / Eteindre l'appareil sélectionné");
+        toggleButton.setOnAction(event -> toggleDevicesState(deviceTable));
+
+        // --- MISE EN PAGE ---
+        VBox root = new VBox(15, sensorTitle, sensorTable, deviceTitle, deviceTable, toggleButton);
+        root.setPadding(new Insets(15));
+
+        Scene scene = new Scene(root, 750, 700);
+
+        primaryStage.setTitle("SmartHome Dashboard");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        // --- TEMPS REEL ---
+        fetchSensorData(sensorTable);
+        fetchDeviceData(deviceTable);
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
+            fetchSensorData(sensorTable);
+            fetchDeviceData(deviceTable); // On rafraîchit aussi les appareils au cas où
+        }));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    // --- METHODES DE CONFIGURATION DES TABLEAUX ---
+    private void setupSensorTable(TableView<SensorData> table) {
+        TableColumn<SensorData, String> nameCol = new TableColumn<>("Capteur");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
+        nameCol.setPrefWidth(150);
+
+        TableColumn<SensorData, Number> valueCol = new TableColumn<>("Température (°C)");
+        valueCol.setCellValueFactory(new PropertyValueFactory<>("sensorValue"));
+        valueCol.setPrefWidth(150);
+
+        TableColumn<SensorData, String> timeCol = new TableColumn<>("Date / Heure");
+        timeCol.setCellValueFactory(new PropertyValueFactory<>("measureTime"));
+        timeCol.setPrefWidth(300);
+
+        table.getColumns().add(nameCol);
+        table.getColumns().add(valueCol);
+        table.getColumns().add(timeCol);
+        table.setPrefHeight(250);
+    }
+
+    private void setupDeviceTable(TableView<Device> table) {
+        TableColumn<Device, String> nameCol = new TableColumn<>("Appareil");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setPrefWidth(200);
+
+        TableColumn<Device, String> typeCol = new TableColumn<>("Type");
+        typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        typeCol.setPrefWidth(150);
+
+        // Colonne spéciale pour l'état (Affichera true ou false)
+        TableColumn<Device, Boolean> stateCol = new TableColumn<>("Allumé ?");
+        stateCol.setCellValueFactory(new PropertyValueFactory<>("state"));
+        stateCol.setPrefWidth(100);
+
+        table.getColumns().add(nameCol);
+        table.getColumns().add(typeCol);
+        table.getColumns().add(stateCol);
+        table.setPrefHeight(200);
+    }
+
+    // --- METHODES DE RECUPERATION DES DONNEES (GET) ---
+    private void fetchSensorData(TableView<SensorData> table) {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_BASE_URL + "/sensor-data")).GET().build();
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(json -> {
+                    Type listType = new TypeToken<List<SensorData>>(){}.getType();
+                    List<SensorData> list = gson.fromJson(json, listType);
+                    Platform.runLater(() -> table.getItems().addAll(list));
+                });
+    }
+
+    private void fetchDeviceData(TableView<Device> table) {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_BASE_URL + "/devices")).GET().build();
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(json -> {
+                    Type listType = new TypeToken<List<Device>>(){}.getType();
+                    List<Device> list = gson.fromJson(json, listType);
+                    Platform.runLater(() -> table.getItems().addAll(list));
+                });
+    }
+
+    // --- METHODE DE CONTRÔLE (PUT) ---
+    private void toggleDevicesState(TableView<Device> table) {
+        Device selectedDevice = table.getSelectionModel().getSelectedItem();
+        if (selectedDevice == null) {
+            System.out.println("Aucun appareil séléctionné !");
+            return;
+        }
+
+        // On inverse l'état
+        selectedDevice.setState(!selectedDevice.isState());
+
+        // On convertit l'objet Java en JSON pour l'envoyer au serveur
+        String jsonBody = gson.toJson(selectedDevice);
+
+        // Requête PUT vers /api/devices/{id}
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_BASE_URL + "/devices/" + selectedDevice.getId()))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenRun(() -> {
+                    Platform.runLater(() -> fetchDeviceData(table)); // ON rafraichit le tableau après la mise a jour
+                });
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+}
+/*
         // Colonnes
         TableColumn<SensorData, String> nameCol = new TableColumn<>("Capteur");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
@@ -122,3 +260,4 @@ public class SmartHomeApp extends Application {
         launch(args);
     }
 }
+*/

@@ -16,13 +16,14 @@ public class SmartHomeApiApplication {
 		SpringApplication.run(SmartHomeApiApplication.class, args);
 	}
 
-	//@Bean
-	//CommandLineRunner initDatabase(DeviceRepository deviceRepository) {
-	//	return args -> {
-	//	deviceRepository.save(new Device("Lampe Salon", "LUMIERE", true));
-	//	deviceRepository.save(new Device("Capteur Chambre", "TEMPERATURE", false));
-	//	System.out.println(">>> Base de données initialisée avec 2 appareils !");
-	//};
-	//	}
+	@Bean
+	CommandLineRunner initDatabase(DeviceRepository deviceRepository) {
+		return args -> {
+			deviceRepository.save(new Device("Lampe Salon", "LUMIERE", true));
+			deviceRepository.save(new Device("Prise Cuisine", "PRISE", false));
+			deviceRepository.save(new Device("Volet Chambre", "VOLET", false));
+			System.out.println(">>> Base de données initialisée avec 3 appareils !");
+		};
+	}
 
 }
