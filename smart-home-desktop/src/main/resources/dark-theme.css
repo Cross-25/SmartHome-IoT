@@ -1,0 +1,285 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   SmartHome Dashboard — Dark Theme
+   Palette :
+     bg-deep   : #0e1117
+     bg-card   : #161b27
+     bg-header : #1a2035
+     accent    : #00d4aa   (teal)
+     accent-2  : #ff6b6b   (rouge prédiction)
+     text-main : #dde4f0
+     text-muted: #7a8499
+     border    : #242c3f
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Fond global ──────────────────────────────────────────────────────── */
+.root-pane {
+    -fx-background-color: #0e1117;
+}
+
+/* ── En-tête ──────────────────────────────────────────────────────────── */
+.header-bar {
+    -fx-background-color: #161b27;
+    -fx-background-radius: 12;
+    -fx-border-color: #242c3f;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.app-title {
+    -fx-text-fill: #dde4f0;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", "SF Pro Display", sans-serif;
+}
+
+.app-subtitle {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+/* ── Badge prédiction IA ─────────────────────────────────────────────── */
+.prediction-badge {
+    -fx-background-color: #0e2a24;
+    -fx-background-radius: 8;
+    -fx-border-color: #00d4aa;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-padding: 8 14 8 14;
+}
+
+.badge-icon {
+    -fx-font-size: 22px;
+}
+
+.badge-label {
+    -fx-text-fill: #00d4aa;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.badge-value {
+    -fx-text-fill: #dde4f0;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+/* ── Cartes ──────────────────────────────────────────────────────────── */
+.card {
+    -fx-background-color: #161b27;
+    -fx-background-radius: 12;
+    -fx-border-color: #242c3f;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.card-header {
+    -fx-background-color: #1a2035;
+    -fx-background-radius: 12 12 0 0;
+    -fx-border-color: transparent transparent #242c3f transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.panel-icon {
+    -fx-font-size: 15px;
+}
+
+.panel-title {
+    -fx-text-fill: #dde4f0;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.count-badge {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 11px;
+    -fx-background-color: #242c3f;
+    -fx-background-radius: 10;
+    -fx-padding: 2 8 2 8;
+}
+
+/* ── Tableaux ────────────────────────────────────────────────────────── */
+.data-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.data-table .table-view {
+    -fx-background-color: transparent;
+}
+
+.data-table .column-header-background {
+    -fx-background-color: #1a2035;
+}
+
+.data-table .column-header,
+.data-table .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #2d3652 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-size: 36;
+}
+
+.data-table .column-header .label {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.data-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #1e2438 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 34px;
+}
+
+.data-table .table-row-cell:hover {
+    -fx-background-color: #1e2845;
+}
+
+.data-table .table-row-cell:selected {
+    -fx-background-color: #0d2e26;
+    -fx-border-color: transparent transparent #00d4aa22 transparent;
+}
+
+.data-table .table-cell {
+    -fx-text-fill: #c4cedf;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 0 10 0 10;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Masquer la barre de défilement horizontale si inutile */
+.data-table .scroll-bar:horizontal {
+    -fx-opacity: 0.3;
+}
+
+.data-table .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.data-table .scroll-bar:vertical .thumb {
+    -fx-background-color: #2d3652;
+    -fx-background-radius: 4;
+}
+
+.table-placeholder {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+/* ── Graphique ───────────────────────────────────────────────────────── */
+.temp-chart {
+    -fx-padding: 0 10 10 10;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-background {
+    -fx-background-color: transparent;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart-legend-item {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 11px;
+}
+
+.chart-title {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 12px;
+}
+
+.axis {
+    -fx-tick-label-fill: #7a8499;
+    -fx-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 11px;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: #1e2438;
+    -fx-stroke-width: 1;
+}
+
+.chart-vertical-zero-line,
+.chart-horizontal-zero-line {
+    -fx-stroke: #2d3652;
+}
+
+/* Ligne historique → teal */
+.default-color0.chart-series-line {
+    -fx-stroke: #00d4aa;
+    -fx-stroke-width: 2.5;
+}
+
+/* Ligne prédiction → rouge */
+.default-color1.chart-series-line {
+    -fx-stroke: #ff6b6b;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 8 4;
+}
+
+/* ── Bouton toggle ───────────────────────────────────────────────────── */
+.toggle-btn {
+    -fx-background-color: #00d4aa;
+    -fx-text-fill: #0e1117;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-background-radius: 7;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.toggle-btn:hover {
+    -fx-background-color: #00f0c0;
+}
+
+.toggle-btn:pressed {
+    -fx-background-color: #00a882;
+}
+
+/* ── Barre de statut ─────────────────────────────────────────────────── */
+.status-bar {
+    -fx-background-color: #161b27;
+    -fx-background-radius: 8;
+    -fx-border-color: #242c3f;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.status-dot {
+    -fx-text-fill: #00d4aa;
+    -fx-font-size: 10px;
+}
+
+.status-text {
+    -fx-text-fill: #7a8499;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.status-hint {
+    -fx-text-fill: #3a4562;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}

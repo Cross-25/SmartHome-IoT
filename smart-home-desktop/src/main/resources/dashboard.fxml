@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.glassinc.smart_home.desktop.SmartHomeController"
+      styleClass="root-pane"
+      spacing="14">
+
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <!-- ═══════════════════════════════════════════
+         EN-TÊTE
+    ════════════════════════════════════════════ -->
+    <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="16">
+        <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+
+        <VBox spacing="2">
+            <Label text="SmartHome" styleClass="app-title"/>
+            <Label text="Tableau de bord domotique" styleClass="app-subtitle"/>
+        </VBox>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Badge de prédiction IA -->
+        <HBox styleClass="prediction-badge" alignment="CENTER" spacing="8">
+            <Label text="🤖" styleClass="badge-icon"/>
+            <VBox spacing="2">
+                <Label text="PRÉDICTION IA" styleClass="badge-label"/>
+                <Label fx:id="predictionLabel" text="Calcul en cours..." styleClass="badge-value"/>
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <!-- ═══════════════════════════════════════════
+         GRAPHIQUE TEMPÉRATURE
+    ════════════════════════════════════════════ -->
+    <VBox styleClass="card" spacing="0">
+        <HBox alignment="CENTER_LEFT" spacing="8" styleClass="card-header">
+            <padding><Insets top="10" right="16" bottom="10" left="16"/></padding>
+            <Label text="📈" styleClass="panel-icon"/>
+            <Label text="Historique &amp; Prédiction de température" styleClass="panel-title"/>
+        </HBox>
+
+        <LineChart fx:id="tempChart"
+                   prefHeight="220"
+                   animated="false"
+                   createSymbols="false"
+                   styleClass="temp-chart"
+                   legendVisible="true">
+            <xAxis>
+                <NumberAxis label="Temps (derniers relevés)" tickMarkVisible="false"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="°C"/>
+            </yAxis>
+        </LineChart>
+    </VBox>
+
+    <!-- ═══════════════════════════════════════════
+         PANNEAUX BAS : CAPTEURS | APPAREILS
+    ════════════════════════════════════════════ -->
+    <HBox spacing="14" VBox.vgrow="ALWAYS">
+
+        <!-- Panneau capteurs -->
+        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="card-header">
+                <padding><Insets top="10" right="16" bottom="10" left="16"/></padding>
+                <Label text="📡" styleClass="panel-icon"/>
+                <Label text="Capteurs en direct" styleClass="panel-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="sensorCountLabel" text="0 relevé(s)" styleClass="count-badge"/>
+            </HBox>
+
+            <TableView fx:id="sensorTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="sensorNameCol"  text="Capteur"     prefWidth="140"/>
+                    <TableColumn fx:id="sensorValueCol" text="Temp. (°C)"  prefWidth="100"/>
+                    <TableColumn fx:id="sensorTimeCol"  text="Date / Heure" prefWidth="175"/>
+                </columns>
+                <placeholder>
+                    <Label text="Connexion à l'API..." styleClass="table-placeholder"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Panneau appareils -->
+        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="card-header">
+                <padding><Insets top="6" right="16" bottom="6" left="16"/></padding>
+                <Label text="💡" styleClass="panel-icon"/>
+                <Label text="Appareils" styleClass="panel-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="toggleButton"
+                        text="Allumer / Éteindre"
+                        styleClass="toggle-btn"
+                        onAction="#toggleDeviceState"/>
+            </HBox>
+
+            <TableView fx:id="deviceTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="deviceNameCol"  text="Appareil" prefWidth="160"/>
+                    <TableColumn fx:id="deviceTypeCol"  text="Type"     prefWidth="120"/>
+                    <TableColumn fx:id="deviceStateCol" text="État"     prefWidth="90"/>
+                </columns>
+                <placeholder>
+                    <Label text="Connexion à l'API..." styleClass="table-placeholder"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+    </HBox>
+
+    <!-- ═══════════════════════════════════════════
+         BARRE DE STATUT
+    ════════════════════════════════════════════ -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="6" right="16" bottom="6" left="16"/></padding>
+        <Label fx:id="statusDot" text="●" styleClass="status-dot"/>
+        <Label fx:id="statusLabel" text="Initialisation..." styleClass="status-text"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Rafraîchissement toutes les 5s" styleClass="status-hint"/>
+    </HBox>
+
+</VBox>
